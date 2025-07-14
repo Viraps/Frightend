@@ -40,8 +40,10 @@ void MainThread(HMODULE module) {
     GUI::SetModules(&g_ModuleManager.modules);
     
     for (auto& mod : g_ModuleManager.modules) {
-        mod->onEnable();
-        mod->enabled = true;
+        for (auto& mod : g_ModuleManager.modules) {
+            std::cout << "[MainThread] Registered: " << mod->getName() << std::endl;
+        }
+
     }
 
     printf("Main loop started. Press END to exit, Right Shift to toggle GUI.\n");

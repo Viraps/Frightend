@@ -11,20 +11,17 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-// Static member variables
+
 static bool g_ShowGui = false;
 static std::vector<std::shared_ptr<BaseModule>>* g_Modules = nullptr;
 
-// DirectX 11 objects
 static ID3D11Device* g_pd3dDevice = nullptr;
 static ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
 static IDXGISwapChain* g_pSwapChain = nullptr;
 static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
 
-// Window handle
 static HWND g_hWnd = nullptr;
 
-// Forward declaration
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool GUI::CreateDeviceD3D(HWND hWnd) {
@@ -85,7 +82,7 @@ LRESULT WINAPI GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         return 0;
     case WM_SYSCOMMAND:
-        if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+        if ((wParam & 0xfff0) == SC_KEYMENU) 
             return 0;
         break;
     case WM_DESTROY:
@@ -96,30 +93,26 @@ LRESULT WINAPI GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 bool GUI::Initialize() {
-    // Create window class
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassEx(&wc);
     
-    // Create window (initially hidden)
     g_hWnd = ::CreateWindow(wc.lpszClassName, L"Module Manager", WS_OVERLAPPEDWINDOW, 100, 100, 450, 400, nullptr, nullptr, wc.hInstance, nullptr);
 
-    // Initialize Direct3D
+    
     if (!CreateDeviceD3D(g_hWnd)) {
         CleanupDeviceD3D();
         ::UnregisterClass(wc.lpszClassName, wc.hInstance);
         return false;
     }
 
-    // Setup Dear ImGui context
+    
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
 
-    // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(g_hWnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
@@ -139,7 +132,6 @@ void GUI::Shutdown() {
 void GUI::Render() {
     if (!g_ShowGui) return;
 
-    // Start the Dear ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
@@ -150,51 +142,43 @@ void GUI::Render() {
     ImGui::Text("Module Management System");
     ImGui::Text("Press Right Shift to toggle this window.");
     ImGui::Separator();
-    
-    // Show modules organized by category
+   
     if (g_Modules && !g_Modules->empty()) {
-        // Group modules by category
         std::map<ModuleCategory, std::vector<std::shared_ptr<BaseModule>>> categorizedModules;
         for (const auto& module : *g_Modules) {
             categorizedModules[module->getCategory()].push_back(module);
         }
 
-        // Display each category as a collapsible tree node
         for (const auto& categoryPair : categorizedModules) {
             ModuleCategory category = categoryPair.first;
             const auto& modules = categoryPair.second;
             
             std::string categoryName = categoryToString(category);
             
-            // Count enabled modules in this category
             int enabledCount = 0;
             for (const auto& module : modules) {
                 if (module->enabled) enabledCount++;
             }
             
-            // Create category header with enabled count
+          
             std::string headerText = categoryName + " (" + std::to_string(enabledCount) + "/" + std::to_string(modules.size()) + ")";
             
             if (ImGui::TreeNode(headerText.c_str())) {
-                // Display modules in this category
                 for (const auto& module : modules) {
-                    ImGui::PushID(module.get()); // Ensure unique IDs
+                    ImGui::PushID(module.get()); 
                     
-                    // Create colored text based on module state
                     if (module->enabled) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f)); // Green for enabled
                     } else {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.7f, 1.0f)); // Gray for disabled
                     }
                     
-                    // Make module name clickable
                     if (ImGui::Selectable(module->getName().c_str(), false, ImGuiSelectableFlags_None)) {
                         module->toggle();
                     }
                     
                     ImGui::PopStyleColor();
                     
-                    // Add tooltip with module info
                     if (ImGui::IsItemHovered()) {
                         ImGui::BeginTooltip();
                         ImGui::Text("Module: %s", module->getName().c_str());
@@ -215,7 +199,6 @@ void GUI::Render() {
     
     ImGui::Separator();
     
-    // Add some utility buttons
     if (g_Modules && !g_Modules->empty()) {
         if (ImGui::Button("Enable All")) {
             for (auto& module : *g_Modules) {
@@ -240,8 +223,7 @@ void GUI::Render() {
     }
     
     ImGui::End();
-
-    // Rendering
+    
     ImGui::Render();
     const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
