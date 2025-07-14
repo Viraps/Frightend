@@ -1,6 +1,6 @@
 # **Frightend**
 
-**Frightend** is a basic injectable client (WIP).  
+**Frightend** is a basic injectable client (JNI).  
 Built for learning and experimenting with injection techniques.
 
 ---
