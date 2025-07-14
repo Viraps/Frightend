@@ -1,7 +1,7 @@
 # **Frightend**
 
 **Frightend** is a basic injectable client (JNI).  
-Built for learning and experimenting with injection techniques.
+Built for Legit cheating 
 
 ---
 
@@ -10,12 +10,10 @@ Still in early development. Expect bugs, unfinished features, and general chaos.
 
 ---
 
-## **Goals**
-- DLL injection into target processes  
-- Hooking, overlays, debug tools, etc.  
-- Just figuring stuff out
+## **How to use!**
+- Download from reales tab or build yourself
+- download or open a porgram like procces-hacker and find javaw.exe
+- right click and Inject dll from downloads folder press right shift to open the gui
 
 ---
 
-## **Note**
-**For educational use only.**
